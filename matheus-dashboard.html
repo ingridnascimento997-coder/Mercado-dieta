@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏠 Casa do Matheus</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --card: #1a1a1a;
+    --accent: #e8b130;
+    --accent2: #e85d30;
+    --green: #4caf6e;
+    --text: #f0ede8;
+    --muted: #888;
+    --border: #2e2e2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; }
+
+  /* ── HEADER ── */
+  header {
+    background: #111; border-bottom: 3px solid var(--accent);
+    padding: 26px 24px 22px; text-align: center; position: relative; overflow: hidden;
+  }
+  header::before { content: '🏠'; position: absolute; left: -10px; top: -10px; font-size: 110px; opacity: 0.05; transform: rotate(-10deg); }
+  header::after  { content: '💪'; position: absolute; right: -10px; bottom: -20px; font-size: 110px; opacity: 0.05; transform: rotate(8deg); }
+  header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem,7vw,3.4rem); letter-spacing: 2px; color: var(--accent); position: relative; }
+  header p  { font-size: 0.82rem; color: var(--muted); margin-top: 4px; position: relative; }
+
+  /* ── NAV PRINCIPAL ── */
+  .main-nav {
+    display: flex; background: #151515; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .main-tab {
+    flex: 1; padding: 15px 10px; text-align: center; cursor: pointer;
+    font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); border-bottom: 3px solid transparent; transition: all 0.2s;
+  }
+  .main-tab:hover { color: var(--text); }
+  .main-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── SEÇÕES PRINCIPAIS ── */
+  .main-section { display: none; }
+  .main-section.active { display: block; }
+
+  /* ══════════════════════════════
+     LISTA DE MERCADO
+  ══════════════════════════════ */
+  .list-wrap { max-width: 960px; margin: 0 auto; padding: 20px 14px 50px; }
+
+  .progress-bar {
+    background: #111; border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 18px; display: flex; align-items: center; gap: 12px;
+    font-size: 0.8rem; color: var(--muted); margin-bottom: 20px;
+  }
+  .bar-track { flex: 1; height: 7px; background: #222; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.35s ease; width: 0%; }
+  #count-label { white-space: nowrap; font-weight: 800; color: var(--accent); font-size: 0.88rem; }
+
+  .add-box {
+    background: var(--card); border: 2px dashed #333;
+    border-radius: 14px; padding: 16px 18px; margin-bottom: 6px;
+  }
+  .add-box h3 { font-size: 0.82rem; font-weight: 800; margin-bottom: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .add-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .add-row input {
+    flex: 1; min-width: 110px; padding: 9px 13px; border: 1.5px solid var(--border);
+    border-radius: 10px; font-family: 'Nunito', sans-serif; font-size: 0.83rem;
+    background: #111; color: var(--text); outline: none;
+  }
+  .add-row input:focus { border-color: var(--accent); }
+  .add-row button {
+    background: var(--accent); color: #000; border: none; padding: 9px 16px;
+    border-radius: 10px; font-family: 'Nunito', sans-serif; font-size: 0.83rem;
+    font-weight: 800; cursor: pointer;
+  }
+  .add-row button:hover { background: #d4a020; }
+
+  .sec-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 1.5px;
+    margin: 26px 0 10px; display: flex; align-items: center; gap: 10px; color: var(--text);
+  }
+  .sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .sec-icon { font-size: 1rem; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 9px; }
+
+  .item {
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 11px;
+    padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px;
+    cursor: pointer; transition: all 0.18s; user-select: none;
+  }
+  .item:hover { border-color: #444; transform: translateY(-1px); }
+  .item.checked { background: #0d1f14; border-color: #2a5c38; }
+  .item.checked .item-name { text-decoration: line-through; color: var(--muted); }
+  .item.checked .chk { background: var(--green); border-color: var(--green); }
+  .item.checked .chk::after { opacity: 1; }
+
+  .chk {
+    width: 19px; height: 19px; border: 2px solid var(--border); border-radius: 5px;
+    flex-shrink: 0; margin-top: 2px; transition: all 0.18s; position: relative;
+  }
+  .chk::after {
+    content: '✓'; position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; color: #000; font-size: 0.68rem; font-weight: 800; opacity: 0; transition: opacity 0.15s;
+  }
+  .item-body { flex: 1; min-width: 0; }
+  .item-name { font-weight: 700; font-size: 0.84rem; line-height: 1.3; }
+  .item-qty  { font-size: 0.72rem; color: var(--accent); font-weight: 700; margin-top: 2px; }
+  .item-note { font-size: 0.69rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+  .reset-btn {
+    display: block; margin: 30px auto 0; background: #222; color: var(--muted); border: 1px solid var(--border);
+    padding: 11px 26px; border-radius: 40px; font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .reset-btn:hover { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+
+  /* ══════════════════════════════
+     RECEITAS
+  ══════════════════════════════ */
+  .rec-wrap { max-width: 900px; margin: 0 auto; padding: 20px 14px 50px; }
+
+  .rec-tabs {
+    display: flex; gap: 0; background: #151515; border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; margin-bottom: 20px;
+  }
+  .rec-tab {
+    flex: 1; padding: 12px 8px; text-align: center; cursor: pointer;
+    font-weight: 800; font-size: 0.78rem; color: var(--muted);
+    border-bottom: 3px solid transparent; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .rec-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: #1a1a1a; }
+
+  .rec-section { display: none; }
+  .rec-section.active { display: block; }
+
+  .intro-banner {
+    background: #1a1500; border: 1px solid #3a2e0a; border-left: 4px solid var(--accent);
+    border-radius: 12px; padding: 13px 18px; margin-bottom: 18px;
+    font-size: 0.82rem; color: #bbb; line-height: 1.6;
+  }
+  .intro-banner strong { color: var(--accent); }
+
+  .rec-grid { display: grid; gap: 14px; }
+
+  .rec-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .rec-card:hover { transform: translateY(-2px); border-color: #3a3a3a; }
+
+  .rc-head {
+    padding: 16px 18px 13px; display: flex; align-items: flex-start; gap: 13px; cursor: pointer;
+  }
+  .rc-emoji {
+    font-size: 2rem; flex-shrink: 0; width: 48px; height: 48px;
+    background: #222; border-radius: 11px; display: flex; align-items: center; justify-content: center;
+  }
+  .rc-info { flex: 1; }
+  .rc-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 1px; line-height: 1.1; }
+  .rc-sub  { font-size: 0.76rem; color: var(--muted); margin-top: 3px; }
+  .rc-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+  .rtag { font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .rtag-diet    { background: #0d2e18; color: #4caf6e; }
+  .rtag-easy    { background: #1a1a2e; color: #6e8cff; }
+  .rtag-fast    { background: #2e1a0d; color: #e88a30; }
+  .rtag-protein { background: #2e0d0d; color: #e85d30; }
+
+  .rc-arrow { color: var(--muted); font-size: 1.1rem; margin-top: 4px; transition: transform 0.2s; flex-shrink: 0; }
+  .rec-card.open .rc-arrow { transform: rotate(180deg); }
+
+  .rc-body { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); }
+  .rec-card.open .rc-body { display: block; }
+
+  .macros-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .macro { background: #111; border: 1px solid var(--border); border-radius: 10px; padding: 7px 12px; text-align: center; flex: 1; min-width: 65px; }
+  .macro-val   { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--accent); }
+  .macro-label { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1px; }
+
+  .body-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  @media (max-width: 480px) { .body-cols { grid-template-columns: 1fr; } .item-grid { grid-template-columns: 1fr 1fr; } }
+
+  .col-label { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 7px; }
+  .ing-list { list-style: none; }
+  .ing-list li { font-size: 0.8rem; padding: 5px 0; border-bottom: 1px solid #1e1e1e; color: #ccc; display: flex; align-items: baseline; gap: 6px; }
+  .ing-list li::before { content: '·'; color: var(--accent); font-size: 1.1rem; }
+
+  .step-list { list-style: none; counter-reset: step; }
+  .step-list li { font-size: 0.8rem; padding: 7px 0 7px 30px; border-bottom: 1px solid #1e1e1e; color: #ccc; position: relative; counter-increment: step; line-height: 1.5; }
+  .step-list li::before {
+    content: counter(step); position: absolute; left: 0; top: 7px;
+    background: var(--accent); color: #000; width: 19px; height: 19px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800;
+  }
+
+  .tip-box { background: #111; border-left: 3px solid var(--green); border-radius: 0 10px 10px 0; padding: 9px 13px; margin-top: 13px; font-size: 0.76rem; color: #aaa; line-height: 1.5; }
+  .tip-box strong { color: var(--green); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Casa do Matheus</h1>
+  <p>Lista do mercado · Receitas fit · Tudo num lugar só</p>
+</header>
+
+<div class="main-nav">
+  <div class="main-tab active" onclick="showMain('lista',this)">🛒 Lista do Mercado</div>
+  <div class="main-tab" onclick="showMain('receitas',this)">🍳 Receitas do Matheus</div>
+</div>
+
+<!-- ═══════════════════════ LISTA ═══════════════════════ -->
+<div class="main-section active" id="main-lista">
+<div class="list-wrap">
+
+  <div class="progress-bar">
+    <span>Progresso</span>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+    <span id="count-label">0 / 0</span>
+    <span id="total-chip" style="font-size:0.72rem;color:var(--muted)">— itens</span>
+  </div>
+
+  <div class="add-box">
+    <h3>✏️ Adicionar item</h3>
+    <div class="add-row">
+      <input id="inp-name" type="text" placeholder="Nome do item" />
+      <input id="inp-qty"  type="text" placeholder="Quantidade" style="max-width:140px" />
+      <button id="btn-add">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div id="list-app"></div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════ RECEITAS ═══════════════════════ -->
+<div class="main-section" id="main-receitas">
+<div class="rec-wrap">
+
+  <div class="rec-tabs">
+    <div class="rec-tab active" onclick="showRec('cafe',this)">☀️ Café</div>
+    <div class="rec-tab" onclick="showRec('almoco',this)">🍽️ Almoço</div>
+    <div class="rec-tab" onclick="showRec('jantar',this)">🌙 Jantar</div>
+  </div>
+
+  <div class="rec-section active" id="rsec-cafe">
+    <div class="intro-banner"><strong>Café da manhã salgado e farto</strong> — sem aveia, sem tapioca, sem nada doce. Opções com cara de refeição de verdade pra começar o dia. 💪</div>
+    <div class="rec-grid" id="rg-cafe"></div>
+  </div>
+  <div class="rec-section" id="rsec-almoco">
+    <div class="intro-banner"><strong>Almoço com sabor de comida de verdade</strong> — adaptações das comidinhas que ele já ama, sem abrir mão do sabor. 🔥</div>
+    <div class="rec-grid" id="rg-almoco"></div>
+  </div>
+  <div class="rec-section" id="rsec-jantar">
+    <div class="intro-banner"><strong>Jantar que satisfaz sem pesar</strong> — leve o suficiente pra não atrapalhar a dieta, gostoso o suficiente pra não sofrer. 🌙</div>
+    <div class="rec-grid" id="rg-jantar"></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* ═══════ LISTA ═══════ */
+const listSections = [
+  { icon:'🥩', label:'Proteínas & Laticínios', color:'#2e1a0d',
+    items:[
+      {name:'Carne para carne louca',qty:'2 kg',note:'Ex: patinho ou acém'},
+      {name:'Carne para bife',qty:'2 kg',note:'Ex: contrafilé ou alcatra'},
+      {name:'Frango',qty:'3 kg',note:'Coxas, peitos ou coxa-sobrecoxa'},
+      {name:'Carne moída',qty:'1,5 kg',note:'Separar em porções de 300g'},
+      {name:'Ovos',qty:'30 unid. (2½ dúz.)',note:'Café, receitas e omelete'},
+      {name:'Iogurte Grego Zero',qty:'10 potes (170g)',note:'Café da manhã dos 15 dias'},
+      {name:'Mussarela',qty:'500 g',note:'Fatiada ou em barra'},
+      {name:'Leite em pó',qty:'1 lata (400g)',note:'Bebê + uso geral'},
+      {name:'Leite',qty:'8 L (caixa longa vida)',note:'Café, vitaminas, receitas'},
+      {name:'Requeijão Light',qty:'2 potes (250g)',note:'Café da manhã'},
+    ]},
+  { icon:'🍞', label:'Pães & Café da Manhã', color:'#0d2e1a',
+    items:[
+      {name:'Pão Egg (pão de ovo)',qty:'3 pcts',note:'Café da manhã leve'},
+      {name:'Pão sírio',qty:'2 pcts',note:'Recheios rápidos'},
+      {name:'Pão francês para congelar',qty:'30 unid.',note:'Congele já em saquinhos'},
+      {name:'Flocos de aveia',qty:'1 pct (500g)',note:'Mingau e vitaminas'},
+      {name:'Flocos de arroz',qty:'1 pct (500g)',note:'Mingau, papinha e receitas'},
+      {name:'Magic Toast',qty:'2 pcts',note:'Torrada crocante café'},
+      {name:'Tapioca (goma)',qty:'1 pct (500g)',note:'Café e lanches rápidos'},
+    ]},
+  { icon:'🧂', label:'Despensa & Temperos', color:'#0d1a2e',
+    items:[
+      {name:'Molho de tomate',qty:'6 cx/sachês',note:'Base de molhos'},
+      {name:'Milho (lata ou sachê)',qty:'3 unid.',note:'Carne louca, saladas'},
+      {name:'Panko',qty:'1 pct',note:'Empanados'},
+      {name:'Massa de pastel',qty:'2 pcts',note:'Refeições rápidas'},
+      {name:'Doce de leite',qty:'1 pote (400g)',note:'Sobremesa / café'},
+      {name:'Pudim de chocolate diet',qty:'3 caixinhas',note:'Sobremesa leve'},
+      {name:'Papel filme',qty:'1 rolo',note:'Organizar porções'},
+      {name:'Sacolinha para proteínas',qty:'1 pct zip/freezer',note:'Porcionamento das carnes'},
+    ]},
+  { icon:'🥦', label:'Hortifrúti & Verduras', color:'#0d2e18',
+    items:[
+      {name:'Batata inglesa',qty:'4 kg',note:'⚠️ Muita batata!'},
+      {name:'Alho',qty:'2 cabeças ou 1 pote',note:'Tempero diário'},
+      {name:'Cebola',qty:'2 kg (± 8 unid.)',note:'Uso diário'},
+      {name:'Pimentão',qty:'4 unid. variados',note:'Carne louca, refogados'},
+      {name:'Salsinha',qty:'2 maços',note:'Tempero fresco'},
+      {name:'Frutas da estação',qty:'± 3 kg mix',note:'Maçã, banana, mamão'},
+    ]},
+  { icon:'🧴', label:'Higiene & Limpeza', color:'#1a0d2e',
+    items:[
+      {name:'Shampoo',qty:'1 frasco',note:''},
+      {name:'Condicionador',qty:'1 frasco',note:''},
+      {name:'Sabonete',qty:'4 unid.',note:'Uso família'},
+      {name:'Gilete / Aparelho de barbear',qty:'1 pct',note:'Para o Matheus'},
+      {name:'Papel higiênico',qty:'1 fardo (16 rolos)',note:'15 dias'},
+      {name:'Papel toalha',qty:'2 rolos',note:'Cozinha'},
+    ]},
+  { icon:'🍬', label:'Guloseimas & Extras', color:'#2e2a0d',
+    items:[
+      {name:'Suspiro',qty:'1 pct',note:'Docinho leve'},
+      {name:'Energético do Matheus',qty:'Qtde. usual',note:'Confirmar marca'},
+    ]},
+  { icon:'➕', label:'Itens Adicionados', color:'#1a1a2e', items:[] },
+];
+
+const checked = {};
+
+function updateProgress() {
+  let total = 0, done = 0;
+  document.querySelectorAll('.item').forEach(function(el){ total++; if(el.classList.contains('checked')) done++; });
+  document.getElementById('count-label').textContent = done + ' / ' + total;
+  document.getElementById('bar-fill').style.width = total ? (done/total*100)+'%' : '0%';
+  document.getElementById('total-chip').textContent = total + ' itens';
+}
+
+function makeItem(name, qty, note, id) {
+  const div = document.createElement('div');
+  div.className = 'item' + (checked[id] ? ' checked' : '');
+  div.innerHTML = '<div class="chk"></div><div class="item-body">' +
+    '<div class="item-name">' + name + '</div>' +
+    (qty  ? '<div class="item-qty">'  + qty  + '</div>' : '') +
+    (note ? '<div class="item-note">' + note + '</div>' : '') +
+    '</div>';
+  div.addEventListener('click', function(){
+    checked[id] = !checked[id];
+    div.classList.toggle('checked', checked[id]);
+    updateProgress();
+  });
+  return div;
+}
+
+function buildList() {
+  const app = document.getElementById('list-app');
+  app.innerHTML = '';
+  listSections.forEach(function(sec, si) {
+    const t = document.createElement('div');
+    t.className = 'sec-title';
+    t.innerHTML = '<div class="sec-icon" style="background:' + sec.color + '">' + sec.icon + '</div>' + sec.label;
+    app.appendChild(t);
+    const g = document.createElement('div');
+    g.className = 'item-grid'; g.id = 'lg-' + si;
+    sec.items.forEach(function(item, i){
+      g.appendChild(makeItem(item.name, item.qty, item.note, si+'-'+i));
+    });
+    if (si === listSections.length-1 && sec.items.length === 0) {
+      const em = document.createElement('div');
+      em.id = 'empty-msg'; em.style.cssText = 'color:#555;font-size:0.8rem;padding:8px 4px;';
+      em.textContent = 'Nenhum item adicionado ainda.'; g.appendChild(em);
+    }
+    app.appendChild(g);
+  });
+
+  const rb = document.createElement('button');
+  rb.className = 'reset-btn'; rb.textContent = '↺ Limpar marcações';
+  rb.addEventListener('click', function(){
+    Object.keys(checked).forEach(function(k){ delete checked[k]; });
+    document.querySelectorAll('.item.checked').forEach(function(el){ el.classList.remove('checked'); });
+    updateProgress();
+  });
+  app.appendChild(rb);
+  updateProgress();
+
+  document.getElementById('btn-add').addEventListener('click', function(){
+    const ni = document.getElementById('inp-name');
+    const qi = document.getElementById('inp-qty');
+    const name = ni.value.trim(); const qty = qi.value.trim();
+    if (!name) { ni.focus(); return; }
+    const lsi = listSections.length - 1;
+    const idx = listSections[lsi].items.length;
+    listSections[lsi].items.push({name:name,qty:qty,note:''});
+    const grid = document.getElementById('lg-' + lsi);
+    const em = document.getElementById('empty-msg');
+    if (em) em.remove();
+    grid.appendChild(makeItem(name, qty, '', lsi+'-'+idx));
+    ni.value = ''; qi.value = ''; ni.focus();
+    updateProgress();
+  });
+  document.getElementById('inp-name').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') document.getElementById('btn-add').click();
+  });
+}
+
+/* ═══════ RECEITAS ═══════ */
+const recipes = {
+  cafe: [
+    {
+      emoji:'🍳', name:'Omelete Recheada de Calabresa e Queijo',
+      subtitle:'Café proteico com sabor de embutido — parece refeição, não café da manhã',
+      tags:['protein','easy','fast'],
+      ingredients:['3 ovos grandes','2 rodelas de calabresa fatiada (bovina ou mista)','1 fatia de mussarela','Sal, pimenta-do-reino','1 dente de alho picado','Cebola picadinha a gosto'],
+      steps:['Bata os ovos com sal, pimenta e alho picado.','Frigideira antiaderente com fio de azeite em fogo médio.','Despeje os ovos e deixe firmar nas bordas sem mexer.','Coloque a calabresa e o queijo em metade.','Dobre, tampe e desligue — o calor derrete o queijo.'],
+      cal:'~340', prot:'32g', carb:'4g', gord:'22g',
+      tip:'💡 Calabresa bovina tem menos gordura que a de porco. Fica com aquele sabor defumado que ele ama, mas sem culpa.'
+    },
+    {
+      emoji:'🥩', name:'Bife no Pão Francês',
+      subtitle:'Sanduíche de bife grelhado — café da manhã de homem, sem rodeio',
+      tags:['protein','easy','fast'],
+      ingredients:['1 bife fino (coxão mole ou patinho)','1 pão francês (congelado descongelado)','Sal grosso e pimenta','1 fatia de mussarela','Mostarda (opcional)','Cebola em rodelas caramelizada'],
+      steps:['Tempere o bife com sal grosso e pimenta.','Frigideira bem quente, sem óleo — sele 2 min cada lado.','Coloque o queijo e tampe por 30 seg para derreter.','Monte no pão com cebola caramelizada e mostarda.'],
+      cal:'~420', prot:'38g', carb:'28g', gord:'14g',
+      tip:'💡 Cebola caramelizada faz toda a diferença. Deixa alguns minutos na frigideira depois do bife — ela absorve o suco da carne.'
+    },
+    {
+      emoji:'🍕', name:'Pizza de Frigideira no Pão Francês',
+      subtitle:'Café da manhã com cara de lanche — pronto em 5 minutos',
+      tags:['fast','easy','diet'],
+      ingredients:['1 pão francês aberto ao meio','3 col. sopa de molho de tomate','1 fatia de mussarela','2 rodelas de calabresa','Orégano e pimenta calabresa'],
+      steps:['Espalhe o molho nos dois lados do pão.','Coloque mussarela e calabresa por cima.','Leve à frigideira em fogo baixo com tampa.','Espere 4–5 min até o queijo derreter bem.','Finalize com orégano.'],
+      cal:'~360', prot:'22g', carb:'30g', gord:'14g',
+      tip:'💡 A tampa é essencial — cria um efeito de forno que derrete o queijo sem queimar o pão.'
+    },
+    {
+      emoji:'🧀', name:'Pão Sírio com Carne Moída Temperada',
+      subtitle:'Tipo uma esfiha aberta e rápida — salgado, farto e proteico',
+      tags:['protein','easy','fast'],
+      ingredients:['1 pão sírio','100g de carne moída','Alho, cebola, sal, pimenta, cominho','1 col. sopa de molho de tomate','Mussarela ralada'],
+      steps:['Refogue a carne moída com alho, cebola e temperos.','Misture o molho de tomate à carne.','Espalhe no pão sírio aberto, cubra com queijo.','Frigideira tampada em fogo baixo por 4 min.'],
+      cal:'~380', prot:'30g', carb:'28g', gord:'14g',
+      tip:'💡 O cominho dá aquele sabor de "esfiha de padaria". Pequeno detalhe, grande diferença.'
+    },
+    {
+      emoji:'🥚', name:'Ovos Mexidos com Calabresa na Frigideira',
+      subtitle:'O clássico turbinado — cremoso, rápido e com sabor forte',
+      tags:['protein','fast','easy'],
+      ingredients:['3 ovos','2 rodelas de calabresa picada','Sal e pimenta','1 col. chá de manteiga ou azeite','Salsinha picada'],
+      steps:['Pique a calabresa e doure na frigideira sem óleo por 2 min.','Bata os ovos com sal e pimenta.','Adicione manteiga à frigideira e despeje os ovos.','Mexa devagar com espátula em fogo baixo.','Desligue antes de secar — fica cremoso. Finalize com salsinha.'],
+      cal:'~320', prot:'26g', carb:'2g', gord:'24g',
+      tip:'💡 O segredo do ovo mexido cremoso é mexer devagar em fogo baixo e desligar antes de parecer pronto — ele termina de cozinhar no calor residual.'
+    },
+  ],
+  almoco: [
+    {
+      emoji:'🍔', name:'Hambúrguer Artesanal Grelhado',
+      subtitle:'O clássico que ele ama — versão caseira sem fritura, muito mais gostoso',
+      tags:['protein','easy','diet'],
+      ingredients:['200g de carne moída (patinho ou acém)','Sal grosso, pimenta, alho em pó','1 pão francês ou sírio','1 fatia de mussarela','Cebola caramelizada','Mostarda e catchup zero'],
+      steps:['Misture a carne com sal, pimenta e alho em pó. Modele o burger.','Frigideira BEM quente, sem óleo — sele 3 min cada lado sem apertar.','Coloque queijo, tampe e deixe derreter.','Monte com cebola caramelizada e condimentos.'],
+      cal:'~480', prot:'42g', carb:'28g', gord:'18g',
+      tip:'💡 Nunca aperte o burger com espátula — perde o suco. Deixa quieto e ele fica suculento igual ao de restaurante.'
+    },
+    {
+      emoji:'🍗', name:'Frango Parmegiana Fit',
+      subtitle:'O favorito dos botecos — empanado com panko, molho e queijo',
+      tags:['protein','diet','easy'],
+      ingredients:['1 filé de frango (peito achatado)','3 col. sopa de panko','1 ovo para empanar','Sal, pimenta, alho','3 col. sopa de molho de tomate','2 fatias de mussarela'],
+      steps:['Tempere o frango com sal, pimenta e alho. Passe no ovo batido e depois no panko.','Frigideira com fio de azeite — doure dos dois lados (±5 min cada).','Cubra com molho de tomate quente e o queijo.','Tampe por 2 min para o queijo derreter.'],
+      cal:'~430', prot:'46g', carb:'18g', gord:'14g',
+      tip:'💡 Panko deixa mais crocante que farinha de trigo comum. Empanado de frigideira tem ±60% menos caloria que o frito.'
+    },
+    {
+      emoji:'🌮', name:'Pastel Assado de Carne com Queijo',
+      subtitle:'Pastel de forno — crocante, recheado e sem o óleo da fritura',
+      tags:['diet','protein','easy'],
+      ingredients:['4 discos de massa de pastel','200g de carne moída temperada','Milho a gosto','1 col. sopa de molho de tomate','Queijo mussarela','1 ovo para pincelar'],
+      steps:['Refogue carne com alho, cebola, sal e pimenta. Misture milho e molho.','Coloque recheio e queijo em metade do disco, feche e aperte com garfo.','Pincele ovo batido por cima.','Forno 200°C por 22–25 min até dourar.'],
+      cal:'~480', prot:'32g', carb:'44g', gord:'18g',
+      tip:'💡 Assar funciona melhor que fritar quando a massa é bem pincelada com ovo — fica dourado e crocante do mesmo jeito.'
+    },
+    {
+      emoji:'🥘', name:'Carne Louca no Pão',
+      subtitle:'Faz 2kg de uma vez e tem almoço garantido por dias',
+      tags:['protein','easy','diet'],
+      ingredients:['Carne louca já pronta em lote','1–2 pães franceses','Pimentão e cebola do cozimento','Requeijão light ou mostarda'],
+      steps:['Faça a carne louca em lote: acém na pressão 40 min com alho, cebola, pimentão, sal e molho de tomate.','Desfie ainda quente e misture ao molho.','Abra o pão, passe requeijão light.','Recheie com bastante carne e pimentões.','Pode prensado na frigideira como misto quente.'],
+      cal:'~420', prot:'38g', carb:'35g', gord:'12g',
+      tip:'💡 Congele em porções de 200g. Almoço de 5 minutos: descongela, aquece, monta no pão.'
+    },
+    {
+      emoji:'🍝', name:'Macarrão Bolonhesa Caseiro',
+      subtitle:'Macarrão com carne moída e molho encorpado — o favorito da dieta',
+      tags:['protein','diet','easy'],
+      ingredients:['80g de macarrão (penne ou espaguete)','150g de carne moída','1 cebola, 2 dentes de alho','1 cx/sachê de molho de tomate','Sal, pimenta, orégano','Mussarela ralada para finalizar'],
+      steps:['Cozinhe o macarrão. Reserve.','Refogue alho e cebola. Adicione a carne até secar.','Despeje o molho, tempere, cozinhe 10 min.','Misture ao macarrão e finalize com queijo.'],
+      cal:'~520', prot:'38g', carb:'55g', gord:'14g',
+      tip:'💡 80g de macarrão cru parece pouco mas cozido dobra de volume. Pese antes de cozinhar.'
+    },
+  ],
+  jantar: [
+    {
+      emoji:'🥩', name:'Bife com Batata Rústica Assada',
+      subtitle:'A dupla clássica — batata assada no forno que parece frita',
+      tags:['protein','diet','easy'],
+      ingredients:['150g de bife (coxão mole)','200g de batata inglesa em cubos','Alho, sal, pimenta, páprica','1 col. sopa de azeite','Salsinha para finalizar'],
+      steps:['Cubos de batata temperados com azeite, sal, páprica e alho.','Forno 220°C por 30 min, mexendo na metade.','Grelhe o bife na frigideira bem quente — 3 min cada lado.','Sirva com salsinha picada.'],
+      cal:'~420', prot:'36g', carb:'32g', gord:'14g',
+      tip:'💡 Páprica defumada na batata muda tudo. Fica com sabor de petisco de bar — sem fritar.'
+    },
+    {
+      emoji:'🍕', name:'Pizza de Frigideira no Pão Sírio',
+      subtitle:'Jantar que parece trapaça — pronto em 5 minutos',
+      tags:['fast','easy','diet'],
+      ingredients:['1 pão sírio','3 col. sopa de molho de tomate','2 fatias de mussarela','2–3 rodelas de calabresa','Orégano e pimenta calabresa'],
+      steps:['Espalhe o molho no pão sírio.','Coloque queijo e calabresa.','Frigideira em fogo baixo com tampa.','5 min até o queijo derreter completamente.','Tempere com orégano.'],
+      cal:'~380', prot:'26g', carb:'34g', gord:'16g',
+      tip:'💡 Psicologicamente é poderoso: comer "pizza" na dieta sem sair do controle faz a semana inteira ser mais sustentável.'
+    },
+    {
+      emoji:'🫕', name:'Caldo de Carne com Batata',
+      subtitle:'Caldo encorpado e quente — preenche o estômago com volume e sabor',
+      tags:['diet','protein','easy'],
+      ingredients:['150g de carne já cozida desfiada ou em cubos','1 batata inglesa média em cubinhos','1 cebola, 2 dentes de alho','1 tomate picado','Sal, colorau, pimenta','Salsinha e cebolinha'],
+      steps:['Refogue alho e cebola. Adicione tomate e deixe murchar.','Adicione a batata e 450ml de água. Cozinhe até amolecer.','Adicione a carne e tempere com colorau, sal e pimenta.','Cozinhe mais 5 min. Finalize com salsinha.'],
+      cal:'~310', prot:'30g', carb:'28g', gord:'6g',
+      tip:'💡 Jantar com caldo = volume sem caloria. O líquido quente dá saciedade real e ajuda a dormir bem.'
+    },
+    {
+      emoji:'🥚', name:'Omelete de Queijo com Bife Picado',
+      subtitle:'Sobra de bife virou jantar proteico — sem desperdício',
+      tags:['protein','fast','easy'],
+      ingredients:['3 ovos','100g de bife picado em cubinhos (sobra do almoço)','1 fatia de mussarela','Sal, pimenta','Cebola picada refogada'],
+      steps:['Refogue a cebola e doure os cubinhos de bife rapidamente.','Bata os ovos com sal e pimenta. Despeje sobre a carne.','Deixe firmar nas bordas, coloque o queijo na metade.','Dobre e tampe até o queijo derreter.'],
+      cal:'~380', prot:'38g', carb:'3g', gord:'24g',
+      tip:'💡 Guardar uma parte do bife do almoço para o jantar resolve dois problemas de uma vez. Zero esforço extra.'
+    },
+    {
+      emoji:'🍗', name:'Frango Grelhado com Pimentão e Cebola',
+      subtitle:'Simples, rápido e com aquele sabor de churrascaria',
+      tags:['protein','diet','fast'],
+      ingredients:['2 filés de frango (peito ou coxa)','1 cebola em rodelas','1 pimentão em tiras','Páprica defumada, alho, sal, pimenta','Fio de azeite'],
+      steps:['Tempere o frango com páprica defumada, alho, sal e pimenta.','Grelhe em frigideira quente — 6 min cada lado.','Retire o frango e na mesma frigideira refogue cebola e pimentão.','Volte o frango por 2 min junto dos legumes.'],
+      cal:'~310', prot:'46g', carb:'10g', gord:'9g',
+      tip:'💡 Páprica defumada imita o sabor de churrasco. Frango simples vira outra coisa com esse tempero.'
+    },
+  ]
+};
+
+function buildRecipes(list, gridId) {
+  const grid = document.getElementById(gridId);
+  const tmap = { diet:['rtag-diet','✅ Fit'], easy:['rtag-easy','🔵 Fácil'], fast:['rtag-fast','⚡ Rápido'], protein:['rtag-protein','💪 Proteico'] };
+  list.forEach(function(r){
+    const tags = r.tags.map(function(t){ const m=tmap[t]; return '<span class="rtag '+m[0]+'">'+m[1]+'</span>'; }).join('');
+    const ings = r.ingredients.map(function(x){ return '<li>'+x+'</li>'; }).join('');
+    const stps = r.steps.map(function(x){ return '<li>'+x+'</li>'; }).join('');
+    const card = document.createElement('div');
+    card.className = 'rec-card';
+    card.innerHTML =
+      '<div class="rc-head" onclick="toggleRec(this)">' +
+        '<div class="rc-emoji">'+r.emoji+'</div>' +
+        '<div class="rc-info">' +
+          '<div class="rc-name">'+r.name+'</div>' +
+          '<div class="rc-sub">'+r.subtitle+'</div>' +
+          '<div class="rc-tags">'+tags+'</div>' +
+        '</div>' +
+        '<div class="rc-arrow">▾</div>' +
+      '</div>' +
+      '<div class="rc-body">' +
+        '<div class="macros-row">' +
+          '<div class="macro"><div class="macro-val">'+r.cal+'</div><div class="macro-label">Calorias</div></div>' +
+          '<div class="macro"><div class="macro-val">'+r.prot+'</div><div class="macro-label">Proteína</div></div>' +
+          '<div class="macro"><div class="macro-val">'+r.carb+'</div><div class="macro-label">Carboidrato</div></div>' +
+          '<div class="macro"><div class="macro-val">'+r.gord+'</div><div class="macro-label">Gordura</div></div>' +
+        '</div>' +
+        '<div class="body-cols">' +
+          '<div><div class="col-label">Ingredientes</div><ul class="ing-list">'+ings+'</ul></div>' +
+          '<div><div class="col-label">Como fazer</div><ol class="step-list">'+stps+'</ol></div>' +
+        '</div>' +
+        '<div class="tip-box">'+r.tip+'</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function toggleRec(header) { header.parentElement.classList.toggle('open'); }
+
+function showMain(id, el) {
+  document.querySelectorAll('.main-section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.main-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('main-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function showRec(id, el) {
+  document.querySelectorAll('.rec-section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.rec-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('rsec-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+buildList();
+buildRecipes(recipes.cafe,   'rg-cafe');
+buildRecipes(recipes.almoco, 'rg-almoco');
+buildRecipes(recipes.jantar, 'rg-jantar');
+</script>
+</body>
+</html>
